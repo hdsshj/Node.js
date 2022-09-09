@@ -2,15 +2,17 @@ import { Request, Response } from 'express';
 import { AnyError, Db, FindOptions, MongoClient, OptionalId } from 'mongodb';
 
 const express = require('express');
-const app = express();
+const methodOverride = require('method-override');
 const bodyParser = require('body-parser');
+const Mongo = require('mongodb').MongoClient;
+const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const Mongo = require('mongodb').MongoClient;
 require('dotenv').config();
 
 app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));
+app.use(methodOverride('_method'));
 
 let db: Db;
 
@@ -85,6 +87,25 @@ app.get('/detail/:id', (req: Request, res: Response) => {
     { _id: parseInt(req.params.id) },
     (err, result) => {
       res.render('detail.ejs', { post: result });
+    }
+  );
+});
+
+app.get('/edit/:id', (req: Request, res: Response) => {
+  db.collection('post').findOne(
+    { _id: parseInt(req.params.id) },
+    (err, result) => {
+      res.render('edit.ejs', { post: result });
+    }
+  );
+});
+
+app.put('/edit/:id', (req: Request, res: Response) => {
+  db.collection('post').updateOne(
+    { _id: parseInt(req.params.id) },
+    { $set: { title: req.body.title, date: req.body.date } },
+    (err, result) => {
+      res.redirect('/list');
     }
   );
 });

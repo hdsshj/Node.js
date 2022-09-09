@@ -29,21 +29,38 @@
           <h4><%=el.title %></h4>
           <p>마감날짜: <%=el.date %></p>
         </div>
-
-        <button
-          type="button"
-          class="btn btn-secondary delete"
-          data-id="<%=el._id%>"
-        >
-          삭제
-        </button>
+        <div class="button-wrapper">
+          <button
+            type="button"
+            class="btn btn-primary update"
+            data-id="<%=el._id%>"
+          >
+            수정 
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary delete"
+            data-id="<%=el._id%>"
+          >
+            삭제
+          </button>
+      </div>
       </li>
       <% }); %>
-    </ul>
+    
     <script>
+      $('.button-wrapper').click(function(e) {
+        e.stopPropagation()
+      })
+
       $('.post').click(function (e) {
         const { id } = e.target.dataset;
         location.href = `/detail/${id}`;
+      });
+
+      $('.update').click(function (e) {
+        const { id } = e.target.dataset;
+        location.href = `/edit/${id}`;
       });
 
       $('.delete').click(function (e) {
