@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -21,40 +20,12 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
 
   <body>
-    <nav class="navbar navbar-expand-lg bg-light">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="/">Todo</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/write">Write</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/list">list</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
+    <%- include('nav.html') %>
 
     <ul class="list-group list-group-flush">
       <% posts.map((el) => { %>
-      <li class="list-group-item">
-        <div>
+      <li class="list-group-item post" data-id="<%= el._id %>">
+        <div class="test" data-id="<%= el._id %>">
           <h4><%=el.title %></h4>
           <p>마감날짜: <%=el.date %></p>
         </div>
@@ -62,7 +33,7 @@
         <button
           type="button"
           class="btn btn-secondary delete"
-          data-id="<%=el._id%> "
+          data-id="<%=el._id%>"
         >
           삭제
         </button>
@@ -70,19 +41,24 @@
       <% }); %>
     </ul>
     <script>
-      $('.delete').click((e) => {
+      $('.post').click(function (e) {
         const { id } = e.target.dataset;
-        console.log(id);
-        var test = $(this);
+        location.href = `/detail/${id}`;
+      });
+
+      $('.delete').click(function (e) {
+        const { id } = e.target.dataset;
         $.ajax({
           method: 'DELETE',
           url: '/delete',
           data: { id },
         })
           .done((res) => {
-            location.reload();
+            $(this).parent('li').fadeOut();
           })
-          .fail(() => {});
+          .fail((xhr, textStatus, errorThrown) => {
+            console.log(xhr, textStatus, errorThrown);
+          });
       });
     </script>
     <script

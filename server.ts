@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { AnyError, Db, FindOptions, MongoClient } from 'mongodb';
+import { AnyError, Db, FindOptions, MongoClient, OptionalId } from 'mongodb';
 
 const express = require('express');
 const app = express();
@@ -10,8 +10,10 @@ const Mongo = require('mongodb').MongoClient;
 require('dotenv').config();
 
 app.set('view engine', 'ejs');
+app.use('/public', express.static('public'));
 
 let db: Db;
+
 Mongo.connect(process.env.DB_CONNECT_URL, (err: any, client: MongoClient) => {
   // console.log(client);
   if (err) return console.error(err);
@@ -69,11 +71,20 @@ app.post('/add', (req: Request, res: Response) => {
 });
 
 app.delete('/delete', (req: Request, res: Response) => {
-  console.log(req.body.id);
   const { id } = req.body;
   const postId = parseInt(id);
   db.collection('post').deleteOne({ _id: postId }, (err, result) => {
     if (err) return res.status(400).send({ message: '삭제 실패' });
     res.status(200).send({ message: '삭제 완료' });
   });
+});
+
+app.get('/detail/:id', (req: Request, res: Response) => {
+  console.log('요청 옴');
+  db.collection('post').findOne(
+    { _id: parseInt(req.params.id) },
+    (err, result) => {
+      res.render('detail.ejs', { post: result });
+    }
+  );
 });

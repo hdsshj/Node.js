@@ -3,3 +3,10 @@ interface PostCounterType {
   totalPost: number;
   name: string;
 }
+
+interface PostListType {
+  _id: number;
+  title: string;
+  date: string;
+  createdAt: string;
+}
