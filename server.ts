@@ -1,9 +1,13 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { AnyError, Db, FindOptions, MongoClient, OptionalId } from 'mongodb';
+import { PassportStatic } from 'passport';
 
 const express = require('express');
 const methodOverride = require('method-override');
 const bodyParser = require('body-parser');
+const passport: PassportStatic = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
 const Mongo = require('mongodb').MongoClient;
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -13,6 +17,9 @@ require('dotenv').config();
 app.set('view engine', 'ejs');
 app.use('/public', express.static('public'));
 app.use(methodOverride('_method'));
+app.use(session({ secret: 'admin', resave: true, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 let db: Db;
 
@@ -50,9 +57,9 @@ app.get('/list', (req: Request, res: Response) => {
 app.post('/add', (req: Request, res: Response) => {
   res.send('전송 완료');
 
-  db.collection('counter').findOne({ name: '게시물갯수' }, (err, result) => {
+  db.collection('counter').findOne({ name: 'post' }, (err, result) => {
     if (result) {
-      const total = result.totalPost;
+      const total = result.total;
 
       db.collection('post').insertOne({
         _id: total + 1,
@@ -62,8 +69,8 @@ app.post('/add', (req: Request, res: Response) => {
       });
 
       db.collection('counter').updateOne(
-        { name: '게시물갯수' },
-        { $inc: { totalPost: 1 } },
+        { name: 'post' },
+        { $inc: { total: 1 } },
         (err) => {
           if (err) return console.error(err);
         }
@@ -108,4 +115,99 @@ app.put('/edit/:id', (req: Request, res: Response) => {
       res.redirect('/list');
     }
   );
+});
+
+app.get('/login', (req: Request, res: Response) => {
+  res.render('login.ejs');
+});
+
+app.post(
+  '/login',
+  passport.authenticate('local', { failureRedirect: '/fail' }),
+  (req: Request, res: Response) => {
+    // db.collection('member').findOne({})
+    res.redirect('/');
+  }
+);
+
+passport.use(
+  new LocalStrategy(
+    {
+      usernameField: 'id',
+      passwordField: 'pw',
+      session: true,
+      passReqToCallback: false,
+    },
+    (reqId: string, reqPw: string, done: any) => {
+      db.collection('member').findOne({ memberId: reqId }, (err, result) => {
+        if (err) return done(err);
+
+        if (!result)
+          return done(null, false, { message: '존재하지않는 아이디요' });
+        if (reqPw == result.password) {
+          return done(null, result);
+        } else {
+          return done(null, false, { message: '비번틀렸어요' });
+        }
+      });
+    }
+  )
+);
+
+passport.serializeUser((user: any, done) => {
+  console.log(user);
+  done(null, user.memberId);
+});
+
+passport.deserializeUser((id, done) => {
+  db.collection('member').findOne({ memberId: id }, (err, result) => {
+    done(null, result);
+  });
+});
+
+const authrization = (req: Request, res: Response, next: NextFunction) => {
+  console.log(req.user);
+  if (req.user) {
+    next();
+  } else {
+    res.redirect('/login');
+  }
+};
+
+app.get('/mypage', authrization, (req: Request, res: Response) => {
+  res.render('mypage.ejs', { user: req.user });
+});
+
+app.get('/search', (req: Request, res: Response) => {
+  console.log(req.query);
+  const searchRules = [
+    {
+      $search: {
+        index: 'titleSearch',
+        text: {
+          query: req.query.value,
+          path: 'title',
+        },
+      },
+    },
+    // 정렬
+    { $sort: { _id: 1 } },
+    // 갯수
+    { $limit: 10 },
+    // 출력 범위, score는 연관성 점수
+    { $project: { title: 1, _id: 0, score: { $meta: 'searchScore' } } },
+  ];
+
+  db.collection('post')
+    .aggregate(searchRules)
+    .toArray((err, result) => {
+      if (err) return console.error(err);
+
+      res.render('searchList.ejs', {
+        searchPosts: result,
+        searchValue: req.query.value,
+      });
+
+      console.log(result);
+    });
 });

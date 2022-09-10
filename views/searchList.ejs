@@ -23,12 +23,13 @@
     <%- include('nav.html') %>
 
     <div class="container input-group mb-2">
-      <input class="form-control" id="search-input" />
+      <input class="form-control" id="search-input"
+          value="<%= searchValue %>" />
       <button class="input-group-append btn btn-danger" id="search">검색</button>
     </div>
 
     <ul class="list-group list-group-flush container">
-      <% posts.map((el) => { %>
+      <% searchPosts.map((el) => { %>
       <li class="list-group-item post" data-id="<%= el._id %>">
         <div class="test" data-id="<%= el._id %>">
           <h4><%=el.title %></h4>

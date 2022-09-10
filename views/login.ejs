@@ -19,23 +19,19 @@
   </style>
 
   <body>
-    <%- include('nav.html') %>
-
     <div class="wrapper">
-      <h3>할 일</h3>
-      <form action="/edit/<%= post._id %>?_method=PUT" method="POST">
+      <h3>ID</h3>
+      <form action="/login" method="POST">
         <div class="input-group mb-3">
-          <input type="text" class="form-control" name="title"
+          <input type="text" class="form-control" name="id"
               aria-label="Sizing example input"
-              aria-describedby="inputGroup-sizing-default"
-              value="<%= post.title %>" />
+              aria-describedby="inputGroup-sizing-default" />
         </div>
-        <h3>Due Date</h3>
+        <h3>PW</h3>
         <div class="input-group mb-3">
-          <input type="date" class="form-control" name="date"
+          <input type="password" class="form-control" name="pw"
               aria-label="Sizing example input"
-              aria-describedby="inputGroup-sizing-default"
-              value="<%= post.date%>" />
+              aria-describedby="inputGroup-sizing-default" />
         </div>
         <button type="submit" class="btn btn-danger">Submit</button>
       </form>
