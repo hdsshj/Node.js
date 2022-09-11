@@ -4,9 +4,16 @@ interface PostCounterType {
   name: string;
 }
 
-interface PostListType {
+interface PostType {
   _id: number;
   title: string;
   date: string;
   createdAt: string;
+  writer: number;
+}
+
+interface MemberType {
+  _id: number;
+  memberId: string;
+  password: string;
 }

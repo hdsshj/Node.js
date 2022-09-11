@@ -1,0 +1,88 @@
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bootstrap demo</title>
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT"
+        crossorigin="anonymous" />
+
+    <link rel="stylesheet" href="/public/main.css" />
+  </head>
+  <style>
+    .list-group-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+  <body>
+    <%- include('nav.html') %>
+
+    <ol class="list-group">
+
+      <% chatRoomsList.map((el) => {%>
+      <li class="list-group-item d-flex justify-content-between align-items-start"
+          data-id="<%= el._id %>">
+        <div class="ms-2 me-auto">
+          <div class="fw-bold"><%= el.title %></div>
+          <%= el.member.toString() %>
+        </div>
+        <span class="badge bg-primary rounded-pill">14</span>
+      </li>
+      <% }) %>
+
+    </ol>
+
+    <div class="col-9 p-0">
+      <div class="chat-room">
+        <ul class="list-group chat-content">
+          <li><span class="chat-box">채팅방1 내용</span></li>
+          <li><span class="chat-box">채팅방1 내용</span></li>
+          <li><span class="chat-box mine">채팅방1 내용</span></li>
+        </ul>
+        <div class="input-group">
+          <input class="form-control" id="chat-input">
+          <button class="btn btn-secondary" id="send">전송</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      let selectRoom;
+      let eventSource;
+
+      $('.list-group-item').click(function() {
+        selectRoom = this.dataset.id;
+        eventSource = new EventSource('/chat/message');
+        eventSource.addEventListener('test', (e) => {
+          console.log(eventSource)
+          console.log(e)
+        })
+
+
+      })
+
+      $('#send').click(() => {
+        const message = $('#chat-input').val();
+        const payload = {
+          roomId: selectRoom,
+          message: message
+        }
+
+        $.post('/chat/message', payload)
+      })
+    </script>
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+        crossorigin="anonymous"></script>
+  </body>
+
+</html>

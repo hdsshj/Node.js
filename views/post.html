@@ -1,0 +1,22 @@
+<% posts.map((el) => { %>
+<li class="list-group-item post" data-id="<%= el._id %>">
+  <div class="test" data-id="<%= el._id %>">
+    <h4><%=el.title %></h4>
+    <p>마감날짜: <%=el.date %></p>
+  </div>
+  <div class="button-wrapper">
+    <button type="button" class="btn btn-dark chat" data-id="<%=el.writer%>">
+      채팅
+    </button>
+
+    <button type="button" class="btn btn-primary update" data-id="<%=el._id%>">
+      수정
+    </button>
+
+    <button type="button" class="btn btn-secondary delete"
+        data-id="<%=el._id%>">
+      삭제
+    </button>
+  </div>
+</li>
+<% }); %>

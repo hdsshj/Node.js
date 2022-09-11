@@ -29,73 +29,58 @@
     </div>
 
     <ul class="list-group list-group-flush container">
-      <% searchPosts.map((el) => { %>
-      <li class="list-group-item post" data-id="<%= el._id %>">
-        <div class="test" data-id="<%= el._id %>">
-          <h4><%=el.title %></h4>
-          <p>마감날짜: <%=el.date %></p>
-        </div>
-        <div class="button-wrapper">
-          <button type="button" class="btn btn-primary update"
-              data-id="<%=el._id%>">
-            수정
-          </button>
-          <button type="button" class="btn btn-secondary delete"
-              data-id="<%=el._id%>">
-            삭제
-          </button>
-        </div>
-      </li>
-      <% }); %>
+      <%- include('post.html') %>
+    </ul>
 
-      <script>
-        $('#search').click((e) => {
-          const searchValue = $('#search-input').val();
 
-          window.location.replace(`/search?value=${searchValue}`);
-        })
+    <script>
+      $('#search').click((e) => {
+        const searchValue = $('#search-input').val();
 
-        $('.button-wrapper').click(function(e) {
-          e.stopPropagation()
-        })
+        window.location.replace(`/search?value=${searchValue}`);
+      })
 
-        $('.post').click(function(e) {
-          const {
-            id
-          } = e.target.dataset;
-          location.href = `/detail/${id}`;
-        });
+      $('.button-wrapper').click(function(e) {
+        e.stopPropagation()
+      })
 
-        $('.update').click(function(e) {
-          const {
-            id
-          } = e.target.dataset;
-          location.href = `/edit/${id}`;
-        });
+      $('.post').click(function(e) {
+        const {
+          id
+        } = e.target.dataset;
+        location.href = `/detail/${id}`;
+      });
 
-        $('.delete').click(function(e) {
-          const {
-            id
-          } = e.target.dataset;
-          $.ajax({
-              method: 'DELETE',
-              url: '/delete',
-              data: {
-                id
-              },
-            })
-            .done((res) => {
-              $(this).parent('li').fadeOut();
-            })
-            .fail((xhr, textStatus, errorThrown) => {
-              console.log(xhr, textStatus, errorThrown);
-            });
-        });
-      </script>
-      <script
-          src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
-          crossorigin="anonymous"></script>
+      $('.update').click(function(e) {
+        const {
+          id
+        } = e.target.dataset;
+        location.href = `/edit/${id}`;
+      });
+
+      $('.delete').click(function(e) {
+        const {
+          id
+        } = e.target.dataset;
+        $.ajax({
+            method: 'DELETE',
+            url: '/delete',
+            data: {
+              id
+            },
+          })
+          .done((res) => {
+            $(this).parent('li').fadeOut();
+          })
+          .fail((xhr, textStatus, errorThrown) => {
+            console.log(xhr, textStatus, errorThrown);
+          });
+      });
+    </script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-u1OknCvxWvY5kfmNBILK2hRnQC3Pr17a+RTT6rIHI7NnikvbZlHgTPOOmMi466C8"
+        crossorigin="anonymous"></script>
   </body>
 
 </html>
